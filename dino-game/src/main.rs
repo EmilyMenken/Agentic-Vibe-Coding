@@ -16,8 +16,10 @@ struct DinoData {
     full_name: String,
     two_pt: Vec<String>,
     one_pt: Vec<String>,
+    hint: String,
     user_answer: Option<String>,
     points_earned: Option<u32>,
+    hint_used: bool,
 }
 
 #[derive(Resource, Default)]
@@ -41,6 +43,9 @@ struct FeedbackText;
 #[derive(Component)]
 struct PromptText;
 
+#[derive(Component)]
+struct HintText;
+
 fn make_dino_list() -> Vec<DinoData> {
     vec![
         DinoData {
@@ -48,144 +53,180 @@ fn make_dino_list() -> Vec<DinoData> {
             full_name: "ankylosaurus".into(),
             two_pt: vec!["anky".into()],
             one_pt: vec!["ornithischian".into()],
+            hint: "The most heavily armored dinosaur.".into(),
             user_answer: None,
             points_earned: None,
+            hint_used: false,
         },
         DinoData {
             filename: "Carcharodontosaurus.png".into(),
             full_name: "carcharodontosaurus".into(),
             two_pt: vec!["carchar".into()],
             one_pt: vec!["theropod".into()],
+            hint: "This guy's name means Shark-Toothed/Jagged-Toothed Lizard.".into(),
             user_answer: None,
             points_earned: None,
+            hint_used: false,
         },
         DinoData {
             filename: "Carnotaurus.png".into(),
             full_name: "carnotaurus".into(),
             two_pt: vec!["carno".into()],
             one_pt: vec!["theropod".into()],
+            hint: "Loved this guy in Disney's Dinosaur, and in the Jurassic Park novel.".into(),
             user_answer: None,
             points_earned: None,
+            hint_used: false,
         },
         DinoData {
             filename: "Deinosuchus.png".into(),
             full_name: "deinosuchus".into(),
             two_pt: vec!["deino".into()],
             one_pt: vec!["croc".into(), "crocodylia".into()],
+            hint: "One of the largest crocodilians of all time, starts with a D!".into(),
             user_answer: None,
             points_earned: None,
+            hint_used: false,
         },
         DinoData {
             filename: "Dilophosaurus.png".into(),
             full_name: "dilophosaurus".into(),
             two_pt: vec!["dilo".into()],
             one_pt: vec!["theropod".into()],
+            hint: "This guy has a frill in Jurassic Park.".into(),
             user_answer: None,
             points_earned: None,
+            hint_used: false,
         },
         DinoData {
             filename: "Giganotosaurus.png".into(),
             full_name: "giganotosaurus".into(),
             two_pt: vec!["giga".into()],
             one_pt: vec!["theropod".into()],
+            hint: "Loved this guy in Jurassic World Dominion!".into(),
             user_answer: None,
             points_earned: None,
+            hint_used: false,
         },
         DinoData {
             filename: "Hatzegopteryx.png".into(),
             full_name: "hatzegopteryx".into(),
             two_pt: vec!["hatz".into()],
             one_pt: vec!["pterosaur".into(), "pterosauria".into()],
+            hint: "The heaviest flying reptile.".into(),
             user_answer: None,
             points_earned: None,
+            hint_used: false,
         },
         DinoData {
             filename: "Kentrosaurus.png".into(),
             full_name: "kentrosaurus".into(),
             two_pt: vec!["kentro".into()],
             one_pt: vec!["ornithischian".into()],
+            hint: "This guy's name includes the city Kent.".into(),
             user_answer: None,
             points_earned: None,
+            hint_used: false,
         },
         DinoData {
             filename: "Mosasaurus.png".into(),
             full_name: "mosasaurus".into(),
             two_pt: vec!["mosa".into()],
             one_pt: vec!["marine reptile".into(), "squamata".into()],
+            hint: "Loved this guy in Jurassic World - a great marine reptile.".into(),
             user_answer: None,
             points_earned: None,
+            hint_used: false,
         },
         DinoData {
             filename: "Quetzalcoatlus.png".into(),
             full_name: "quetzalcoatlus".into(),
             two_pt: vec!["quetz".into()],
             one_pt: vec!["pterosaur".into(), "pterosauria".into()],
+            hint: "The tallest flying reptile - as tall as a giraffe.".into(),
             user_answer: None,
             points_earned: None,
+            hint_used: false,
         },
         DinoData {
             filename: "Spinosaurus.png".into(),
             full_name: "spinosaurus".into(),
             two_pt: vec!["spino".into()],
             one_pt: vec!["theropod".into()],
+            hint: "Loved this guy in Jurassic Park 3!".into(),
             user_answer: None,
             points_earned: None,
+            hint_used: false,
         },
         DinoData {
             filename: "Stegosaurus.png".into(),
             full_name: "stegosaurus".into(),
             two_pt: vec!["stego".into()],
             one_pt: vec!["ornithischian".into()],
+            hint: "Loved this guy in Jurassic Park 2!".into(),
             user_answer: None,
             points_earned: None,
+            hint_used: false,
         },
         DinoData {
             filename: "Therizinosaurus.png".into(),
             full_name: "therizinosaurus".into(),
             two_pt: vec!["theri".into()],
             one_pt: vec!["theropod".into()],
+            hint: "The weirdest theropod... a herbivore with long Freddy Krueger-esque claws.".into(),
             user_answer: None,
             points_earned: None,
+            hint_used: false,
         },
         DinoData {
             filename: "Triceratops.png".into(),
             full_name: "triceratops".into(),
             two_pt: vec!["trike".into()],
             one_pt: vec!["ornithischian".into()],
+            hint: "This guy was sick in Jurassic Park! Literally!".into(),
             user_answer: None,
             points_earned: None,
+            hint_used: false,
         },
         DinoData {
             filename: "TyrannosaurusRex.png".into(),
             full_name: "tyrannosaurus rex".into(),
             two_pt: vec!["trex".into(), "t-rex".into(), "t rex".into()],
             one_pt: vec!["theropod".into()],
+            hint: "Oh, you know who this is. Take a wild guess...".into(),
             user_answer: None,
             points_earned: None,
+            hint_used: false,
         },
         DinoData {
             filename: "Utahraptor.png".into(),
             full_name: "utahraptor".into(),
             two_pt: vec!["raptor".into()],
             one_pt: vec!["theropod".into()],
+            hint: "The largest known raptor!".into(),
             user_answer: None,
             points_earned: None,
+            hint_used: false,
         },
         DinoData {
             filename: "Velociraptor.png".into(),
             full_name: "velociraptor".into(),
             two_pt: vec!["raptor".into()],
             one_pt: vec!["theropod".into()],
+            hint: "This little guy is a lot smaller IRL than in the movies...".into(),
             user_answer: None,
             points_earned: None,
+            hint_used: false,
         },
         DinoData {
             filename: "Yutyrannus.png".into(),
             full_name: "yutyrannus".into(),
             two_pt: vec!["yuty".into()],
             one_pt: vec!["theropod".into()],
+            hint: "Largest dinosaur known to have feathers!".into(),
             user_answer: None,
             points_earned: None,
+            hint_used: false,
         },
     ]
 }
@@ -247,7 +288,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, dino_list: Res<
     commands.spawn((
         Sprite {
             image: asset_server.load(format!("images/{}", first.filename)),
-            custom_size: Some(Vec2::new(400., 350.)),
+            custom_size: Some(Vec2::new(500., 500.)),
             ..default()
         },
         Transform::from_xyz(0., 80., 1.),
@@ -268,12 +309,12 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, dino_list: Res<
     ));
 
     commands.spawn((
-        Text::new("What dinosaur is this? Type your answer. → to submit, type 'skip' to skip."),
-        TextFont { font_size: 18.0, ..default() },
+        Text::new("What dinosaur is this? Type your answer. Enter to submit, type 'skip' to skip."),
+        TextFont { font_size: 16.0, ..default() },
         TextColor(Color::srgb(0.8, 0.8, 0.8)),
         Node {
             position_type: PositionType::Absolute,
-            bottom: Val::Px(90.),
+            bottom: Val::Px(110.),
             left: Val::Px(20.),
             ..default()
         },
@@ -286,11 +327,24 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, dino_list: Res<
         TextColor(Color::srgb(0.2, 1.0, 0.4)),
         Node {
             position_type: PositionType::Absolute,
-            bottom: Val::Px(55.),
+            bottom: Val::Px(75.),
             left: Val::Px(20.),
             ..default()
         },
         InputText,
+    ));
+
+    commands.spawn((
+        Text::new("Down Arrow for a hint"),
+        TextFont { font_size: 16.0, ..default() },
+        TextColor(Color::srgb(0.5, 0.8, 1.0)),
+        Node {
+            position_type: PositionType::Absolute,
+            bottom: Val::Px(50.),
+            left: Val::Px(20.),
+            ..default()
+        },
+        HintText,
     ));
 
     commands.spawn((
@@ -341,6 +395,14 @@ fn keyboard_input(
             dino_list.current_index += 1;
             buffer.0.clear();
             skip_confirm.0 = false;
+        }
+        return;
+    }
+
+    // Down arrow — show hint (only if not already answered)
+    if keyboard.just_pressed(KeyCode::ArrowDown) {
+        if !already_answered {
+            dino_list.dinos[idx].hint_used = true;
         }
         return;
     }
@@ -400,10 +462,11 @@ fn keyboard_input(
 
 fn update_ui(
     mut image_query: Query<&mut Sprite, With<DinoImage>>,
-    mut input_query: Query<&mut Text, (With<InputText>, Without<ScoreText>, Without<FeedbackText>, Without<PromptText>)>,
-    mut score_query: Query<&mut Text, (With<ScoreText>, Without<InputText>, Without<FeedbackText>, Without<PromptText>)>,
-    mut feedback_query: Query<&mut Text, (With<FeedbackText>, Without<InputText>, Without<ScoreText>, Without<PromptText>)>,
-    mut prompt_query: Query<&mut Text, (With<PromptText>, Without<InputText>, Without<ScoreText>, Without<FeedbackText>)>,
+    mut input_query: Query<&mut Text, (With<InputText>, Without<ScoreText>, Without<FeedbackText>, Without<PromptText>, Without<HintText>)>,
+    mut score_query: Query<&mut Text, (With<ScoreText>, Without<InputText>, Without<FeedbackText>, Without<PromptText>, Without<HintText>)>,
+    mut feedback_query: Query<&mut Text, (With<FeedbackText>, Without<InputText>, Without<ScoreText>, Without<PromptText>, Without<HintText>)>,
+    mut prompt_query: Query<&mut Text, (With<PromptText>, Without<InputText>, Without<ScoreText>, Without<FeedbackText>, Without<HintText>)>,
+    mut hint_query: Query<&mut Text, (With<HintText>, Without<InputText>, Without<ScoreText>, Without<FeedbackText>, Without<PromptText>)>,
     buffer: Res<TypingBuffer>,
     dino_list: Res<DinoList>,
     skip_confirm: Res<SkipConfirm>,
@@ -412,7 +475,6 @@ fn update_ui(
     let total = dino_list.dinos.len();
     let idx = dino_list.current_index;
 
-    // Update score display
     if let Ok(mut text) = score_query.get_single_mut() {
         **text = format!("Score: {} | Dino {}/{}", dino_list.score, (idx + 1).min(total), total);
     }
@@ -426,7 +488,10 @@ fn update_ui(
             **text = "Thanks for playing!".into();
         }
         if let Ok(mut text) = feedback_query.get_single_mut() {
-            **text = "← to review your answers".into();
+            **text = "Left Arrow to review your answers".into();
+        }
+        if let Ok(mut text) = hint_query.get_single_mut() {
+            **text = "".into();
         }
         return;
     }
@@ -442,11 +507,11 @@ fn update_ui(
     // Update prompt
     if let Ok(mut text) = prompt_query.get_single_mut() {
         if skip_confirm.0 {
-            **text = "Are you sure you want to skip? Type 'yes' and press → to confirm, or press → to cancel.".into();
+            **text = "Are you sure you want to skip? Type 'yes' + Enter to confirm, or just Enter to cancel.".into();
         } else if already_answered {
-            **text = "← back  |  → next".into();
+            **text = "Left Arrow back  |  Right Arrow next".into();
         } else {
-            **text = "What dinosaur is this? Type your answer. → to submit, type 'skip' to skip.".into();
+            **text = "What dinosaur is this? Type your answer. Enter to submit, type 'skip' to skip.".into();
         }
     }
 
@@ -462,6 +527,17 @@ fn update_ui(
             }
         } else {
             **text = format!("> {}", buffer.0);
+        }
+    }
+
+    // Update hint
+    if let Ok(mut text) = hint_query.get_single_mut() {
+        if already_answered {
+            **text = "".into();
+        } else if dino.hint_used {
+            **text = format!("Hint: {}", dino.hint);
+        } else {
+            **text = "Down Arrow for a hint".into();
         }
     }
 
