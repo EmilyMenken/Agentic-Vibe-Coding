@@ -8,7 +8,6 @@ struct DinoList {
     dinos: Vec<DinoData>,
     current_index: usize,
     score: u32,
-    answered: bool,
 }
 
 #[derive(Clone)]
@@ -17,7 +16,15 @@ struct DinoData {
     full_name: String,
     two_pt: Vec<String>,
     one_pt: Vec<String>,
+    user_answer: Option<String>,
+    points_earned: Option<u32>,
 }
+
+#[derive(Resource, Default)]
+struct TypingBuffer(String);
+
+#[derive(Resource, Default)]
+struct SkipConfirm(bool);
 
 #[derive(Component)]
 struct DinoImage;
@@ -34,9 +41,6 @@ struct FeedbackText;
 #[derive(Component)]
 struct PromptText;
 
-#[derive(Resource, Default)]
-struct TypingBuffer(String);
-
 fn make_dino_list() -> Vec<DinoData> {
     vec![
         DinoData {
@@ -44,108 +48,144 @@ fn make_dino_list() -> Vec<DinoData> {
             full_name: "ankylosaurus".into(),
             two_pt: vec!["anky".into()],
             one_pt: vec!["ornithischian".into()],
+            user_answer: None,
+            points_earned: None,
         },
         DinoData {
             filename: "Carcharodontosaurus.png".into(),
             full_name: "carcharodontosaurus".into(),
             two_pt: vec!["carchar".into()],
             one_pt: vec!["theropod".into()],
+            user_answer: None,
+            points_earned: None,
         },
         DinoData {
             filename: "Carnotaurus.png".into(),
             full_name: "carnotaurus".into(),
             two_pt: vec!["carno".into()],
             one_pt: vec!["theropod".into()],
+            user_answer: None,
+            points_earned: None,
         },
         DinoData {
             filename: "Deinosuchus.png".into(),
             full_name: "deinosuchus".into(),
             two_pt: vec!["deino".into()],
             one_pt: vec!["croc".into(), "crocodylia".into()],
+            user_answer: None,
+            points_earned: None,
         },
         DinoData {
             filename: "Dilophosaurus.png".into(),
             full_name: "dilophosaurus".into(),
             two_pt: vec!["dilo".into()],
             one_pt: vec!["theropod".into()],
+            user_answer: None,
+            points_earned: None,
         },
         DinoData {
             filename: "Giganotosaurus.png".into(),
             full_name: "giganotosaurus".into(),
             two_pt: vec!["giga".into()],
             one_pt: vec!["theropod".into()],
+            user_answer: None,
+            points_earned: None,
         },
         DinoData {
             filename: "Hatzegopteryx.png".into(),
             full_name: "hatzegopteryx".into(),
             two_pt: vec!["hatz".into()],
             one_pt: vec!["pterosaur".into(), "pterosauria".into()],
+            user_answer: None,
+            points_earned: None,
         },
         DinoData {
             filename: "Kentrosaurus.png".into(),
             full_name: "kentrosaurus".into(),
             two_pt: vec!["kentro".into()],
             one_pt: vec!["ornithischian".into()],
+            user_answer: None,
+            points_earned: None,
         },
         DinoData {
             filename: "Mosasaurus.png".into(),
             full_name: "mosasaurus".into(),
             two_pt: vec!["mosa".into()],
             one_pt: vec!["marine reptile".into(), "squamata".into()],
+            user_answer: None,
+            points_earned: None,
         },
         DinoData {
             filename: "Quetzalcoatlus.png".into(),
             full_name: "quetzalcoatlus".into(),
             two_pt: vec!["quetz".into()],
             one_pt: vec!["pterosaur".into(), "pterosauria".into()],
+            user_answer: None,
+            points_earned: None,
         },
         DinoData {
             filename: "Spinosaurus.png".into(),
             full_name: "spinosaurus".into(),
             two_pt: vec!["spino".into()],
             one_pt: vec!["theropod".into()],
+            user_answer: None,
+            points_earned: None,
         },
         DinoData {
             filename: "Stegosaurus.png".into(),
             full_name: "stegosaurus".into(),
             two_pt: vec!["stego".into()],
             one_pt: vec!["ornithischian".into()],
+            user_answer: None,
+            points_earned: None,
         },
         DinoData {
             filename: "Therizinosaurus.png".into(),
             full_name: "therizinosaurus".into(),
             two_pt: vec!["theri".into()],
             one_pt: vec!["theropod".into()],
+            user_answer: None,
+            points_earned: None,
         },
         DinoData {
             filename: "Triceratops.png".into(),
             full_name: "triceratops".into(),
             two_pt: vec!["trike".into()],
             one_pt: vec!["ornithischian".into()],
+            user_answer: None,
+            points_earned: None,
         },
         DinoData {
             filename: "TyrannosaurusRex.png".into(),
             full_name: "tyrannosaurus rex".into(),
             two_pt: vec!["trex".into(), "t-rex".into(), "t rex".into()],
             one_pt: vec!["theropod".into()],
+            user_answer: None,
+            points_earned: None,
         },
         DinoData {
             filename: "Utahraptor.png".into(),
             full_name: "utahraptor".into(),
             two_pt: vec!["raptor".into()],
             one_pt: vec!["theropod".into()],
+            user_answer: None,
+            points_earned: None,
         },
         DinoData {
             filename: "Velociraptor.png".into(),
             full_name: "velociraptor".into(),
             two_pt: vec!["raptor".into()],
             one_pt: vec!["theropod".into()],
+            user_answer: None,
+            points_earned: None,
         },
         DinoData {
             filename: "Yutyrannus.png".into(),
             full_name: "yutyrannus".into(),
             two_pt: vec!["yuty".into()],
             one_pt: vec!["theropod".into()],
+            user_answer: None,
+            points_earned: None,
         },
     ]
 }
@@ -191,9 +231,9 @@ fn main() {
             dinos: make_dino_list(),
             current_index: 0,
             score: 0,
-            answered: false,
         })
         .insert_resource(TypingBuffer::default())
+        .insert_resource(SkipConfirm::default())
         .add_systems(Startup, setup)
         .add_systems(Update, (keyboard_input, update_ui))
         .run();
@@ -228,8 +268,8 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, dino_list: Res<
     ));
 
     commands.spawn((
-        Text::new("What dinosaur is this? Press Enter to submit."),
-        TextFont { font_size: 20.0, ..default() },
+        Text::new("What dinosaur is this? Type your answer. → to submit, type 'skip' to skip."),
+        TextFont { font_size: 18.0, ..default() },
         TextColor(Color::srgb(0.8, 0.8, 0.8)),
         Node {
             position_type: PositionType::Absolute,
@@ -255,7 +295,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, dino_list: Res<
 
     commands.spawn((
         Text::new(""),
-        TextFont { font_size: 24.0, ..default() },
+        TextFont { font_size: 22.0, ..default() },
         TextColor(Color::srgb(1.0, 1.0, 0.3)),
         Node {
             position_type: PositionType::Absolute,
@@ -272,43 +312,89 @@ fn keyboard_input(
     mut evr_char: EventReader<KeyboardInput>,
     mut buffer: ResMut<TypingBuffer>,
     mut dino_list: ResMut<DinoList>,
+    mut skip_confirm: ResMut<SkipConfirm>,
 ) {
     use bevy::input::keyboard::Key;
 
-    if dino_list.answered {
-        if keyboard.just_pressed(KeyCode::Enter) {
-            dino_list.answered = false;
-            dino_list.current_index += 1;
+    let total = dino_list.dinos.len();
+    let idx = dino_list.current_index;
+
+    if idx >= total {
+        return;
+    }
+
+    let already_answered = dino_list.dinos[idx].user_answer.is_some();
+
+    // Left arrow — go back (view only)
+    if keyboard.just_pressed(KeyCode::ArrowLeft) {
+        if idx > 0 {
+            dino_list.current_index -= 1;
             buffer.0.clear();
+            skip_confirm.0 = false;
         }
         return;
     }
 
-    for ev in evr_char.read() {
-        if ev.state.is_pressed() {
-            match &ev.logical_key {
-                Key::Character(c) => {
-                    buffer.0.push_str(c.as_str());
+    // Right arrow — move forward (only after answered)
+    if keyboard.just_pressed(KeyCode::ArrowRight) {
+        if already_answered && idx + 1 <= total {
+            dino_list.current_index += 1;
+            buffer.0.clear();
+            skip_confirm.0 = false;
+        }
+        return;
+    }
+
+    // Enter — submit (only if not already answered)
+    if keyboard.just_pressed(KeyCode::Enter) {
+        if !already_answered {
+            let trimmed = buffer.0.trim().to_lowercase();
+
+            if skip_confirm.0 {
+                if trimmed == "yes" {
+                    dino_list.dinos[idx].user_answer = Some("skip".into());
+                    dino_list.dinos[idx].points_earned = Some(0);
+                    buffer.0.clear();
+                    skip_confirm.0 = false;
+                } else {
+                    buffer.0.clear();
+                    skip_confirm.0 = false;
                 }
-                Key::Space => {
-                    buffer.0.push(' ');
-                }
-                Key::Backspace => {
-                    buffer.0.pop();
-                }
-                Key::Enter => {
-                    if dino_list.current_index < dino_list.dinos.len() {
-                        let pts = score_answer(
-                            &buffer.0,
-                            &dino_list.dinos[dino_list.current_index].clone(),
-                        );
-                        dino_list.score += pts;
-                        dino_list.answered = true;
-                    }
-                }
-                _ => {}
+            } else if trimmed == "skip" {
+                skip_confirm.0 = true;
+                buffer.0.clear();
+            } else if !trimmed.is_empty() {
+                let pts = score_answer(&trimmed, &dino_list.dinos[idx].clone());
+                dino_list.score += pts;
+                dino_list.dinos[idx].user_answer = Some(trimmed.clone());
+                dino_list.dinos[idx].points_earned = Some(pts);
+                buffer.0.clear();
+                skip_confirm.0 = false;
             }
         }
+        return;
+    }
+
+    // Typing — only allowed if not already answered
+    if !already_answered {
+        for ev in evr_char.read() {
+            if ev.state.is_pressed() {
+                match &ev.logical_key {
+                    Key::Character(c) => {
+                        buffer.0.push_str(c.as_str());
+                    }
+                    Key::Space => {
+                        buffer.0.push(' ');
+                    }
+                    Key::Backspace => {
+                        buffer.0.pop();
+                    }
+                    _ => {}
+                }
+            }
+        }
+    } else {
+        evr_char.clear();
     }
 }
 
@@ -320,11 +406,19 @@ fn update_ui(
     mut prompt_query: Query<&mut Text, (With<PromptText>, Without<InputText>, Without<ScoreText>, Without<FeedbackText>)>,
     buffer: Res<TypingBuffer>,
     dino_list: Res<DinoList>,
+    skip_confirm: Res<SkipConfirm>,
     asset_server: Res<AssetServer>,
 ) {
     let total = dino_list.dinos.len();
+    let idx = dino_list.current_index;
 
-    if dino_list.current_index >= total {
+    // Update score display
+    if let Ok(mut text) = score_query.get_single_mut() {
+        **text = format!("Score: {} | Dino {}/{}", dino_list.score, (idx + 1).min(total), total);
+    }
+
+    // Game over screen
+    if idx >= total {
         if let Ok(mut text) = prompt_query.get_single_mut() {
             **text = format!("Game over! Final score: {}/{}", dino_list.score, total * 3);
         }
@@ -332,45 +426,58 @@ fn update_ui(
             **text = "Thanks for playing!".into();
         }
         if let Ok(mut text) = feedback_query.get_single_mut() {
-            **text = "".into();
+            **text = "← to review your answers".into();
         }
         return;
     }
 
-    let dino = &dino_list.dinos[dino_list.current_index];
+    let dino = &dino_list.dinos[idx];
+    let already_answered = dino.user_answer.is_some();
 
+    // Update image
     if let Ok(mut sprite) = image_query.get_single_mut() {
         sprite.image = asset_server.load(format!("images/{}", dino.filename));
     }
 
-    if let Ok(mut text) = score_query.get_single_mut() {
-        **text = format!("Score: {} | Dino {}/{}", dino_list.score, dino_list.current_index + 1, total);
-    }
-
-    if let Ok(mut text) = input_query.get_single_mut() {
-        **text = format!("> {}", buffer.0);
-    }
-
-    if let Ok(mut text) = feedback_query.get_single_mut() {
-        if dino_list.answered {
-            let pts = score_answer(&buffer.0, dino);
-            let msg = match pts {
-                3 => format!("✓ Perfect! +3 pts — it was {}", dino.full_name),
-                2 => format!("~ Close! +2 pts — it was {}", dino.full_name),
-                1 => format!("~ Partial! +1 pt — it was {}", dino.full_name),
-                _ => format!("✗ Nope! +0 pts — it was {}", dino.full_name),
-            };
-            **text = format!("{} | Press Enter for next", msg);
+    // Update prompt
+    if let Ok(mut text) = prompt_query.get_single_mut() {
+        if skip_confirm.0 {
+            **text = "Are you sure you want to skip? Type 'yes' and press → to confirm, or press → to cancel.".into();
+        } else if already_answered {
+            **text = "← back  |  → next".into();
         } else {
-            **text = "".into();
+            **text = "What dinosaur is this? Type your answer. → to submit, type 'skip' to skip.".into();
         }
     }
 
-    if let Ok(mut text) = prompt_query.get_single_mut() {
-        if dino_list.answered {
-            **text = "".into();
+    // Update input line
+    if let Ok(mut text) = input_query.get_single_mut() {
+        if already_answered {
+            let answer = dino.user_answer.as_deref().unwrap_or("");
+            let pts = dino.points_earned.unwrap_or(0);
+            if answer == "skip" {
+                **text = "You skipped this one.".into();
+            } else {
+                **text = format!("Your answer: {} (+{} pts)", answer, pts);
+            }
         } else {
-            **text = "What dinosaur is this? Press Enter to submit.".into();
+            **text = format!("> {}", buffer.0);
+        }
+    }
+
+    // Update feedback
+    if let Ok(mut text) = feedback_query.get_single_mut() {
+        if already_answered {
+            let pts = dino.points_earned.unwrap_or(0);
+            let msg = match pts {
+                3 => format!("✓ Perfect! — it was {}", dino.full_name),
+                2 => format!("~ Close! — it was {}", dino.full_name),
+                1 => format!("~ Partial! — it was {}", dino.full_name),
+                _ => format!("✗ — it was {}", dino.full_name),
+            };
+            **text = msg;
+        } else {
+            **text = "".into();
         }
     }
 }
