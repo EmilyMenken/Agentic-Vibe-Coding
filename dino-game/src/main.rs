@@ -309,7 +309,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, dino_list: Res<
     ));
 
     commands.spawn((
-        Text::new("What dinosaur is this? Type your answer. Enter to submit, type 'skip' to skip."),
+        Text::new("What dinosaur/reptile is this? Type your answer. Enter to submit, type 'skip' to skip."),
         TextFont { font_size: 16.0, ..default() },
         TextColor(Color::srgb(0.8, 0.8, 0.8)),
         Node {
@@ -511,7 +511,7 @@ fn update_ui(
         } else if already_answered {
             **text = "Left Arrow back  |  Right Arrow next".into();
         } else {
-            **text = "What dinosaur is this? Type your answer. Enter to submit, type 'skip' to skip.".into();
+            **text = "What dinosaur/reptile is this? Type your answer. Enter to submit, type 'skip' to skip.".into();
         }
     }
 
